@@ -23,6 +23,47 @@ const appEnv = cfenv.getAppEnv();
 // create a new express server
 const app = express();
 
+// 2 Meg upload limit.
+const sizeLimit = 1024 * 1024 * 5;
+
+function logSource(request) {
+  return ` ${request.method} ${request.url} from ${request.ip} - ${request.socket.remoteAddress}:${request.socket.remotePort}`;
+}
+
+function memory() {
+  return JSON.stringify(process.memoryUsage());
+}
+
+function getBody(request, response) {
+  return new Promise((resolve, reject) => {
+    const cl = request.get('Content-Length') || 0;
+    if (cl > sizeLimit) {
+      reject(new Error(`Uploaded content limited to ${sizeLimit} bytes and not ${cl}`));
+      return;
+    }
+
+    let body = '';
+    let sofar = 0;
+
+    request.on('data', (data) => {
+      sofar += data.length;
+      if (sofar > sizeLimit) {
+        reject(new Error(`Uploaded content limited to ${sizeLimit} bytes and that has been exceeded`));
+        return;
+      }
+      body += data;
+    });
+
+    request.on('end', () => {
+      resolve(body);
+    });
+  }).catch((err) => {
+    response.status(413).json({ error: err.message });
+    response.end(null, null, () => request.destroy());
+    console.warn(`${err.message} ${logSource(request)}`);
+  });
+}
+
 function extract(data) {
   if (!data || data.length < 3) {
     throw new Error('Input needs to be at least 3 characters long.');
@@ -39,51 +80,42 @@ function intract(data) {
   return `0${src}`;
 }
 
+function faultLog(response, status, message) {
+  console.warn(`Fault Status ${status}: ${message}`);
+  response.status(status).json({ error: message });
+}
+
 function decode(request, response) {
-  let body = '';
-
-  request.on('data', (data) => {
-    body += data;
-  });
-
-  request.on('end', () => {
-    let result = '';
-    let ok = false;
-    try {
-      result = extract(body);
-      ok = true;
-    } catch (err) {
-      result = {
-        error: err.message
-      };
-    }
-    response.status(ok ? 200 : 400).send(`${JSON.stringify(result, 0, 2)}\n\n`);
-  });
-
-  return null;
+  const src = logSource(request);
+  console.info(`Decode ${src}`);
+  getBody(request, response)
+    .then((body) => {
+      if (body == null) {
+        // payload problem already dealt with.
+        return;
+      }
+      const result = extract(body);
+      response.status(200).send(`${JSON.stringify(result, null, 2)}\n`);
+      console.info(`Complete ${src} ${memory()}`);
+    })
+    .catch(err => faultLog(response, 400, err.message));
 }
 
 function encode(request, response) {
-  let body = '';
-
-  request.on('data', (data) => {
-    body += data;
-  });
-
-  request.on('end', () => {
-    let result = '';
-    let ok = false;
-    try {
+  const src = logSource(request);
+  console.info(`Encode ${src}`);
+  getBody(request, response)
+    .then((body) => {
+      if (body == null) {
+        // payload problem already dealt with.
+        return;
+      }
       const json = JSON.parse(body);
-      result = intract(json);
-      ok = true;
-    } catch (err) {
-      result = err.message;
-    }
-    response.status(ok ? 200 : 400).send(`${result}\n`);
-  });
-
-  return null;
+      const result = intract(json);
+      response.status(200).send(`${result}\n`);
+      console.info(`Complete ${src} ${memory()}`);
+    })
+    .catch(err => faultLog(response, 400, err.message));
 }
 
 app.post('/decode', decode);

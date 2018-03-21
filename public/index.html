@@ -48,8 +48,13 @@
         document.getElementById("ajaxDecode").addEventListener('click', makeDecodeRequest);
         document.getElementById("ajaxEncode").addEventListener('click', makeEncodeRequest);
 
+        const source = document.getElementById("ajaxBlueprintString");
+        const decoded = document.getElementById("ajaxBlueprintDecoded");
+        const encoded = document.getElementById("ajaxBlueprintEncoded");
+
 
         function makeDecodeRequest() {
+          decoded.value = 'Thinking....';
           httpRequest = new XMLHttpRequest();
 
           if (!httpRequest) {
@@ -58,12 +63,12 @@
           }
           httpRequest.onreadystatechange = alertDecodeContents;
           httpRequest.open('POST', '/decode');
-          httpRequest.send(document.getElementById("ajaxBlueprintString").value.trim());
+          httpRequest.send(source.value.trim());
         }
 
         function alertDecodeContents() {
           if (httpRequest.readyState === XMLHttpRequest.DONE) {
-            document.getElementById("ajaxBlueprintDecoded").value = httpRequest.responseText;
+            decoded.value = httpRequest.responseText;
             if (httpRequest.status !== 200) {
               alert('There was a problem with the request.');
             }
@@ -71,6 +76,7 @@
         }
 
         function makeEncodeRequest() {
+          encoded.value = 'Thinking....';
           httpRequest = new XMLHttpRequest();
 
           if (!httpRequest) {
@@ -79,12 +85,12 @@
           }
           httpRequest.onreadystatechange = alertEncodeContents;
           httpRequest.open('POST', '/encode');
-          httpRequest.send(document.getElementById("ajaxBlueprintDecoded").value);
+          httpRequest.send(decoded.value);
         }
 
         function alertEncodeContents() {
           if (httpRequest.readyState === XMLHttpRequest.DONE) {
-            document.getElementById("ajaxBlueprintEncoded").value = httpRequest.responseText;
+            encoded.value = httpRequest.responseText;
             if (httpRequest.status !== 200) {
               alert('There was a problem with the request.');
             }
