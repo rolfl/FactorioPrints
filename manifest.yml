@@ -2,4 +2,4 @@
 applications:
 - name: factorioprint
   random-route: true
-  memory: 64M
+  memory: 256M

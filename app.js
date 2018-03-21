@@ -23,7 +23,7 @@ const appEnv = cfenv.getAppEnv();
 // create a new express server
 const app = express();
 
-// 2 Meg upload limit.
+// 5 Meg upload limit.
 const sizeLimit = 1024 * 1024 * 5;
 
 function logSource(request) {
@@ -95,7 +95,9 @@ function decode(request, response) {
         return;
       }
       const result = extract(body);
-      response.status(200).send(`${JSON.stringify(result, null, 2)}\n`);
+      response.status(200)
+        .set('Content-type', 'application/json')
+        .send(`${JSON.stringify(result, null, 2)}\n`);
       console.info(`Complete ${src} ${memory()}`);
     })
     .catch(err => faultLog(response, 400, err.message));
@@ -112,7 +114,9 @@ function encode(request, response) {
       }
       const json = JSON.parse(body);
       const result = intract(json);
-      response.status(200).send(`${result}\n`);
+      response.status(200)
+        .set('Content-type', 'text/plain')
+        .send(`${result}\n`);
       console.info(`Complete ${src} ${memory()}`);
     })
     .catch(err => faultLog(response, 400, err.message));
