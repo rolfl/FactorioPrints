@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Factorio BluePrint Decoder</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="stylesheets/style.css">
+  </head>
+
+  <body>
+    <table>
+      <tr>
+        <td style= "width:30%;">
+          <img class = "newappIcon" src="images/newapp-icon.png">
+        </td>
+        <td>
+          <h1 id="message">Factorio Blueprint Decoder</h1>
+          <hr />
+          <label>BluePrint String:
+            <textarea rows="10" cols="50" id="ajaxBlueprintString"> </textarea>
+          </label>
+          <p />
+          <span id="ajaxDecode" style="cursor: pointer; text-decoration: underline">
+            Decode String
+          </span>
+          <p />
+          <label>BluePrint JSON:
+            <textarea rows="10" cols="50"  id="ajaxBlueprintDecoded" > </textarea>
+          </label>
+          <p />
+          <span id="ajaxEncode" style="cursor: pointer; text-decoration: underline">
+            Encode JSON
+          </span>
+          <p />
+          <label>BluePrint String:
+            <textarea rows="10" cols="50"  id="ajaxBlueprintEncoded" > </textarea>
+          </label>
+          <p />
+          <hr />
+        </td>
+      </tr>
+    </table>
+    <script type="text/javascript">
+      (function() {
+        var httpRequest;
+        document.getElementById("ajaxDecode").addEventListener('click', makeDecodeRequest);
+        document.getElementById("ajaxEncode").addEventListener('click', makeEncodeRequest);
+
+
+        function makeDecodeRequest() {
+          httpRequest = new XMLHttpRequest();
+
+          if (!httpRequest) {
+            alert('Giving up :( Cannot create an XMLHTTP instance');
+            return false;
+          }
+          httpRequest.onreadystatechange = alertDecodeContents;
+          httpRequest.open('POST', '/decode');
+          httpRequest.send(document.getElementById("ajaxBlueprintString").value.trim());
+        }
+
+        function alertDecodeContents() {
+          if (httpRequest.readyState === XMLHttpRequest.DONE) {
+            document.getElementById("ajaxBlueprintDecoded").value = httpRequest.responseText;
+            if (httpRequest.status !== 200) {
+              alert('There was a problem with the request.');
+            }
+          }
+        }
+
+        function makeEncodeRequest() {
+          httpRequest = new XMLHttpRequest();
+
+          if (!httpRequest) {
+            alert('Giving up :( Cannot create an XMLHTTP instance');
+            return false;
+          }
+          httpRequest.onreadystatechange = alertEncodeContents;
+          httpRequest.open('POST', '/encode');
+          httpRequest.send(document.getElementById("ajaxBlueprintDecoded").value);
+        }
+
+        function alertEncodeContents() {
+          if (httpRequest.readyState === XMLHttpRequest.DONE) {
+            document.getElementById("ajaxBlueprintEncoded").value = httpRequest.responseText;
+            if (httpRequest.status !== 200) {
+              alert('There was a problem with the request.');
+            }
+          }
+        }
+      })();
+    </script>
+  </body>
+
+</html>

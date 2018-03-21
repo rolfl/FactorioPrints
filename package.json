@@ -1,0 +1,24 @@
+{
+	"name": "NodejsStarterApp",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"start": "node app.js",
+		"eslint": "./node_modules/.bin/eslint ."
+	},
+	"dependencies": {
+		"cfenv": "1.0.x",
+		"express": "4.15.x",
+		"tableify": "^1.1.0",
+		"uuid": "^3.2.1"
+	},
+	"devDependencies": {
+		"eslint": "^4.19.0",
+		"eslint-config-airbnb-base": "^11.3.2",
+		"eslint-plugin-import": "^2.2.0"
+	},
+	"repository": {},
+	"engines": {
+		"node": "6.x"
+	}
+}

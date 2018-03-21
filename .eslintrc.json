@@ -1,0 +1,83 @@
+{
+  "ecmaFeatures": {
+    "modules": false
+  },
+  "env": {
+    "browser": false,
+    "es6": true,
+    "node": true,
+    "mocha": true
+  },
+  "extends": [
+    "airbnb-base"
+  ],
+  "globals": {
+    "Promise": true,
+    "Set": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "script"
+  },
+  "plugins": [
+    "import"
+  ],
+  "root": true,
+  "rules": {
+    "no-underscore-dangle": [
+      "error",
+      {
+        "allow": [
+          "_debug",
+          "_platapiManager",
+          "_request",
+          "_response",
+          "_trace"
+        ]
+      }
+    ],
+    "no-param-reassign": [
+      "error",
+      {
+        "props": false
+      }
+    ],
+    "comma-dangle": "off",
+    "global-require": "off",
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": true,
+        "optionalDependencies": false,
+        "peerDependencies": true
+      }
+    ],
+    "max-len": [
+      "error",
+      130,
+      4
+    ],
+    "new-cap": [
+      "error",
+      {
+        "capIsNew": true,
+        "capIsNewExceptions": [
+          "Server"
+        ]
+      }
+    ],
+    "no-console": [
+      "error",
+      {
+        "allow": [
+          "warn",
+          "error",
+          "info"
+        ]
+      }
+    ],
+    "no-plusplus": "off",
+    "no-continue": "off",
+    "prefer-rest-params": 0
+  }
+}

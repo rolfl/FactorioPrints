@@ -1,0 +1,5 @@
+---
+applications:
+- name: factorioprint
+  random-route: true
+  memory: 64M
